@@ -5,6 +5,7 @@ $ git clone git://github.com/rinunu/study_scala_ca.git
 $ cd study_scala_ca
 
 sbt(ビルドツール) を実行します
+
 $ ./sbt
 
 sbt が起動したら、各種コマンドを実行します
