@@ -1,0 +1,39 @@
+* はじめ方
+** ソースを落として sbt を起動します
+$ git clone git://github.com/rinunu/study_scala_ca.git
+
+$ cd study_scala_ca
+
+sbt(ビルドツール) を実行します
+$ ./sbt
+
+sbt が起動したら、各種コマンドを実行します
+(コマンドはタブで補完できます)
+
+** IntelliJ IDEA を使っている方 
+
+> gen-idea
+
+プロジェクトファイルが出来ているので、 IDEA で開きます。
+
+** eclipse を使っている方
+
+> eclipse
+
+プロジェクトファイルが出来ているので、 eclipse で開きます。
+
+** sbt で実行する方
+
+> run # main を見つけて実行してくれます。
+
+** lets enjoy!
+* 第18章
+** はじめに本をもとに前半を説明
+
+** シミュレーションについて説明
+1. 回路図をみる
+2. h18.BasicCircuitSimulationTest をみる
+3. こんな風に DSL でかけますよ
+
+
+** 実装
