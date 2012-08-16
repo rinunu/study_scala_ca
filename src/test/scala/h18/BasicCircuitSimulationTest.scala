@@ -10,38 +10,9 @@ class BasicCircuitSimulationTest extends FunSuite {
   // ここで Shift + Command + F10(IDEA の場合) 押すと、テストを実行できます。
 
   /**
-   * お試し用デジタル回路シミュレーション！
-   *
-   * 回路の各ゲートのディレイは回路実装技術によって様々なので、
-   * サブクラスで定義します。
-   */
-  abstract class CircuitSimulation extends BasicCircuitSimulation {
-
-    /**
-     * 図18.2 半加算器
-     *
-     * 基本ゲートから、より複雑なゲートを作る例です
-     *
-     * テストみてね
-     */
-    def halfAdder(a: Wire, b: Wire, s: Wire, c: Wire) {
-      // TODO 未実装
-    }
-
-    /**
-     * 図18.3 全加算器回路
-     *
-     * さらに halfAdder を使って、より複雑なゲートを作ってみます
-     */
-    def fullAdder(a: Wire, b: Wire, cin: Wire, sum: Wire, cout: Wire) {
-      // TODO 未実装
-    }
-  }
-
-  /**
    * お試し用！
    */
-  class MySimulation() extends CircuitSimulation with TestProbe {
+  class TestSimulation() extends CircuitSimulation with TestProbe {
     def InverterDelay: Int = 1
 
     def AndGateDelay: Int = 3
@@ -50,7 +21,7 @@ class BasicCircuitSimulationTest extends FunSuite {
   }
 
   test("wire の信号を設定してみます") {
-    val s = new MySimulation
+    val s = new TestSimulation
     val a = new s.Wire
     assert(!a.getSignal, "初期値は false")
 
@@ -59,7 +30,7 @@ class BasicCircuitSimulationTest extends FunSuite {
   }
 
   test("probe で wire を測定してみます") {
-    val s = new MySimulation
+    val s = new TestSimulation
 
     val wire0 = new s.Wire
 
@@ -77,7 +48,7 @@ class BasicCircuitSimulationTest extends FunSuite {
   }
 
   test("AND ゲート を使ってみます") {
-    val s = new MySimulation
+    val s = new TestSimulation
 
     val in0, in1, out = new s.Wire
     s andGate(in0, in1, out)
@@ -102,7 +73,7 @@ class BasicCircuitSimulationTest extends FunSuite {
 
     def test(signal1: Boolean, signal2: Boolean,
              expectedSum: Boolean, expectedCarry: Boolean) {
-      val s = new MySimulation
+      val s = new TestSimulation
       val input1, input2, sum, carry = new s.Wire
       s logProbe("sum", sum)
       s checkLog "sum 0 new-value = false"
