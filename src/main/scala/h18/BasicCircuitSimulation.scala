@@ -8,7 +8,7 @@ abstract class BasicCircuitSimulation extends Simulation {
   def AndGateDelay: Int
 
   // 後述
-  def OrGateDelayDelay: Int
+  def OrGateDelay: Int
 
   /**
    * 配線

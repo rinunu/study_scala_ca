@@ -1,16 +1,13 @@
 package h18
 
 import org.scalatest.FunSuite
-import collection.mutable.ListBuffer
 
 /**
  * 回路 DSL のテストです
  */
 class BasicCircuitSimulationTest extends FunSuite {
+
   // ここで Shift + Command + F10(IDEA の場合) 押すと、テストを実行できます。
-  test("テストのテスト") {
-    assert(1 === 3)
-  }
 
   /**
    * お試し用デジタル回路シミュレーション！
@@ -28,12 +25,7 @@ class BasicCircuitSimulationTest extends FunSuite {
      * テストみてね
      */
     def halfAdder(a: Wire, b: Wire, s: Wire, c: Wire) {
-      // こんな DSL で、半加算器が作れます
-      val d, e = new Wire
-      orGate(a, d, e)
-      andGate(a, b, c)
-      inverter(c, e)
-      andGate(d, e, s)
+      // TODO 未実装
     }
 
     /**
@@ -49,48 +41,87 @@ class BasicCircuitSimulationTest extends FunSuite {
   /**
    * お試し用！
    */
-  class MySimulation() extends CircuitSimulation {
+  class MySimulation() extends CircuitSimulation with TestProbe {
     def InverterDelay: Int = 1
 
     def AndGateDelay: Int = 3
 
-    def OrGateDelayDelay: Int = 5
-
-    val logs = ListBuffer[String]()
-
-    /**
-     * 本にはないですが、テスト用に追加しました。
-     *
-     * 指定した wire に probe を設定します。
-     *
-     * この probe は logs にログを出力します
-     */
-    def logProbe(name: String, wire: Wire) {
-      def probeAction() {
-        "%s %d new-value = %s".format(name, currentTime, wire.getSignal)
-      }
-    }
+    def OrGateDelay: Int = 5
   }
 
-  test("単純な配線") {
+  test("wire の信号を設定してみます") {
+    val s = new MySimulation
+    val a = new s.Wire
+    assert(!a.getSignal, "初期値は false")
+
+    a setSignal true
+    assert(a.getSignal, "true を設定してみた")
+  }
+
+  test("probe で wire を測定してみます") {
     val s = new MySimulation
 
-    val input1, input2, sum, carry = new s.Wire
+    val wire0 = new s.Wire
 
-    s.logProbe("sum", sum)
-    // probe 挿入時にアクションが1回実行されるので、
-    // ここで出力が表示されます。
-    assert(s.logs === Seq("sum 0new-value = false"))
+    s logProbe("wire0", wire0) // テスト用に、ここでは logProbe を使います
+    // つけたタイミングで probe が出力します
+    s checkLog "wire0 0 new-value = false"
+
+    // wire の信号を変えてみます
+    wire0 setSignal true
+    s checkLog "wire0 0 new-value = true"
+
+    // wire の信号が変わらない場合は、何も出力されません
+    wire0 setSignal true
+    s.checkLog()
+  }
+
+  test("AND ゲート を使ってみます") {
+    val s = new MySimulation
+
+    val in0, in1, out = new s.Wire
+    s andGate(in0, in1, out)
+    s logProbe("out", out)
+    s checkLog "out 0 new-value = false"
+
+    // 入力を設定して、 run
+    in0 setSignal true
+    in1 setSignal true
+    s.run()
+    s checkLog "out 3 new-value = true"
+
+    in0 setSignal true
+    in1 setSignal false
+    s.run()
+    s checkLog "out 6 new-value = false"
   }
 
   test("半加算器を使ってみます") {
-    // ２個の１桁の２進数を加算できます
+    // 2個の1桁の2進数を加算できます
+    // carry は桁上りの有無です
+
+    def test(signal1: Boolean, signal2: Boolean,
+             expectedSum: Boolean, expectedCarry: Boolean) {
+      val s = new MySimulation
+      val input1, input2, sum, carry = new s.Wire
+      s logProbe("sum", sum)
+      s checkLog "sum 0 new-value = false"
+
+      s logProbe("carry", carry)
+      s checkLog "carry 0 new-value = false"
+
+      s halfAdder(input1, input2, sum, carry)
+      input1 setSignal signal1
+      input2 setSignal signal2
+      s.run()
+
+      assert(sum.getSignal === expectedSum)
+      assert(carry.getSignal === expectedCarry)
+    }
+
+    test(false, false, false, false)
+    test(true, false, true, false)
+    test(false, true, true, false)
+    test(true, true, false, true)
   }
-
-  test("全加算器を使ってみます") {
-    // ２個の１桁の２進数を加算できます
-    // 0+0=0 1+0=1 0+1=1 1+1=10
-  }
-
-
 }
